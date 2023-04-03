@@ -1,0 +1,76 @@
+﻿@page "/segment"
+@page "/segment/{id:int}"
+@inject ISegmentService SegmentService
+@inject NavigationManager NavigationManager
+
+@if (Id is null)
+{
+    <PageTitle>Create a new Product</PageTitle>
+    <h3>Create a new Product</h3>
+}
+else
+{
+    <PageTitle>Edit @segment.Nome</PageTitle>
+    <h3>Edit @segment.Descricao</h3>
+}
+
+<EditForm Model="segment" OnSubmit="HandleSubmit">
+    <div>
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="segment.Nome" class="form-control" />
+    </div>
+    <div>
+        <label for="category">Category</label>
+        <InputText id="category" @bind-Value="segment.Descricao" class="form-control" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    <button type="button" class="btn btn-danger"
+            @onclick="DeleteProduct">
+        Delete Product
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    VtbCase.Shared.Segment segment =
+        new VtbCase.Shared.Segment { Nome = "New Segment" };
+
+    protected override void OnInitialized()
+    {
+        btnText = Id == null ? "Save New Segment" : "Update Segment";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await SegmentService.GetSegmentById((int)Id);
+            if (result is not null)
+                segment = result;
+            else
+                NavigationManager.NavigateTo("/segment");
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            await SegmentService.CreateSegment(segment);
+        }
+        else
+        {
+            await SegmentService.UpdateSegment((int)Id, segment);
+        }
+    }
+
+    async Task DeleteProduct()
+    {
+        await SegmentService.DeleteSegment(segment.Id);
+    }
+}

@@ -1,0 +1,48 @@
+﻿@page "/segments"
+@inject ISegmentService SegmentService
+@inject NavigationManager NavigationManager
+
+<h3>Segmentos</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descricao</th>
+            <th></th>
+        </tr>
+
+
+
+    </thead>
+    <tbody>
+        @foreach (var segment in SegmentService.Segments)
+        {
+            <tr>
+                <td>@segment.Nome</td>
+                <td>@segment.Descricao</td>
+                <td>
+                    <button class="btn btn-primary"
+                        @onclick="(() => ShowSegment(segment.Id))">
+                        <i class="oi oi-pencil;"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SegmentService.GetSegments();
+
+    }
+    void ShowSegment(int id)
+    {
+        NavigationManager.NavigateTo($"segment{id}");
+
+    }
+}
